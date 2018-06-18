@@ -582,7 +582,7 @@ const RecipeSchema = new Schema({
 module.exports = mongoose.model('Recipe', RecipeSchema);
 ```
 
-While we are here let's add these lines to `app.js`:
+While we are here let's add these lines to `app.js` together with the other `app.use` middleware:
 
 ```js
 app.use((req, res, next) => {
