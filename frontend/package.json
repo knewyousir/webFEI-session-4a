@@ -1,0 +1,21 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "browser-sync start --server \"app\" --files \"app\"",
+    "sassy": "node-sass --watch \"scss\"  --output \"app/css/\"",
+    "boom!": "concurrently \"npm run start\" \"npm run sassy\" "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.24.4",
+    "concurrently": "^3.5.1",
+    "node-sass": "^4.9.0"
+  },
+  "dependencies": {
+  }
+}

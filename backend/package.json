@@ -1,0 +1,25 @@
+{
+  "name": "session-7",
+  "version": "1.0.0",
+  "description": "## Homework",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/front-end-intermediate/session-7.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/front-end-intermediate/session-7/issues"
+  },
+  "homepage": "https://github.com/front-end-intermediate/session-7#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongoose": "^5.1.5"
+  }
+}
