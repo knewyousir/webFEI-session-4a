@@ -1,9 +1,5 @@
 # IV - Server Side with ExpressJS
 
-https://github.com/babel/example-node-server
-
-Run session 7
-
 ## Building a Rest API
 
 Building a URL route scheme to map requests to app actions.
