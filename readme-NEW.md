@@ -8,6 +8,7 @@ Run session 7
 
 Building a URL route scheme to map requests to app actions.
 
+1. cd into `backend``
 1. Run `$ npm init -y`
 1. Setup Tooling and npm Installs `npm install --save express mongoose body-parser`
 1. Create an npm script for nodemon (`npm run start`)
