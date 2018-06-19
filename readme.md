@@ -2,6 +2,8 @@
 
 ## Building a Rest API
 
+Take a peek at the [documentation](https://developer.github.com/v3/) for an API. Test this url in a browser: `https://api.github.com/users/12`.
+
 Building a URL route scheme to map requests to app actions.
 
 1. Run `$ npm init -y`
@@ -15,6 +17,8 @@ Building a URL route scheme to map requests to app actions.
 ```
 
 ### Mongo Demo
+
+If desired, MongoDb can be installed on your computer for local and offline use. 
 
 Start `mongod` in another Terminal tab (if it's not running already).
 
@@ -35,11 +39,25 @@ $ mongo
 > exit
 ```
 
+You can insert data using the mongo CLI:
+
+```sh
+$ mongo
+> show dbs
+> use rest-api
+> show collections
+> db.createCollection('recipes')
+> db.recipes.insert( { "name": "Toast", "image": "toast.jpg", "description": "Tasty!" } )
+> db.recipes.find()
+```
+
+Here is a [quick reference](https://docs.mongodb.com/manual/reference/mongo-shell/) to mongo shell commands.
+
 ### Body Parser
 
 [Body Parser](https://www.npmjs.com/package/body-parser) parses and places incoming requests in a `req.body` property so our handlers can use them.
 
-#### app.js
+### app.js
 
 Create `app.js` for express at the top level of the folder:
 
@@ -67,7 +85,7 @@ Run the app using `npm start`.
 
 Make a change to res.send in app.js to check that the server restarts. (Keep an eye on the nodemon process during this exercise to see if it is hanging.)
 
-## API Routes
+### API Routes
 
 DEMO: An api route is a predefined URL path that our API responds to, e.g.:
 
@@ -102,17 +120,15 @@ app.delete('/api/recipes/:id', recipes.delete);
 
 Each route consists of three parts:
 
-* A specific HTTP Action (get, post...)
-* A specific URL path (/api/piates...)
-* A handler method (findAll)
-
-Note: `module.exports` - the object that's returned as the result of a require call we will use in `app.js`.
+* A specific HTTP Action (`get, post...`)
+* A specific URL path (`/api/piates...`)
+* A handler method (`findAll`)
 
 All the main elements of a [REST application](http://www.restapitutorial.com/lessons/httpmethods.html) - GET, POST, PUT, DELETE - http actions are accounted for here.
 
-We've modeled our URL routes off of REST API conventions, and named our handling methods clearly - prefixing them with `api/` in order to differentiate them from routes we create within Angular.
+We've modeled our URL routes off of REST API conventions, and named our handling methods clearly - prefixing them with `api/` in order to differentiate them from routes we create on the front end.
 
-Note the require statement. We'll create a recipes controller and placed all our request event handling methods inside the it.
+Note the `recipes.function` notation. We'll create a recipes controller file and placed all our request event handling methods inside the it.
 
 ### Controllers
 
@@ -130,39 +146,11 @@ exports.delete = function() {};
 
 Note the use of `exports` above. This makes the functions available for import elsewhere in a Node application.
 
-### Check if its working
+#### Check if its working
 
 1: Update `app.js` to require our controllers (the .js file extension can be omitted):
 
 `const recipes = require('./api/recipe.controllers');`
-
-<!-- NOTE: we are also creating the appRoutes variable to call the function in recipe.routes:
-
-`const recipeRoutes = function(app)` -->
-
-```js
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-
-// make sure this line always appears before any routes
-app.use(bodyParser.json());
-
-const recipes = require('./api/recipe.controllers');
-
-app.get('/', function(req, res) {
-  res.send('Ahoy there');
-});
-
-app.get('/api/recipes', recipes.findAll);
-app.get('/api/recipes/:id', recipes.findById);
-app.post('/api/recipes', recipes.add);
-app.put('/api/recipes/:id', recipes.update);
-app.delete('/api/recipes/:id', recipes.delete);
-
-app.listen(3001);
-console.log('Server running at http://localhost:3001/');
-```
 
 2: Update findAll's definition in `recipe.controllers.js` to send a json snippet:
 
@@ -191,9 +179,9 @@ You should see the json in the bowser.
 
 Rather than using the MongoClient as we did previously ( e.g. `const mongo = require('mongoDB').MongoClient;`), we will use [Mongoose](http://mongoosejs.com) to model application data and connect to our database. Here's the [quickstart guide](http://mongoosejs.com/docs/).
 
-Mongoose is built upon the MongoDB driver we used previously so everything we are doing here would work with the original driver. However, Mongoose allows us to model our data - declare that the data be of a certain type, validate the data, and build queries. This is something that is integral to TypeScript and so will be unnecessary in our future work with Angular 2+.
+Mongoose is built upon the MongoDB driver we used previously so everything we are doing here would work with the original driver. However, Mongoose allows us to model our data - declare that the data be of a certain type, validate the data, and build queries.
 
-Add a new file `recipe.model.js` to `src` for our Recipe Model.
+Add a new file `recipe.model.js` to `api` for our Recipe Model.
 
 Require Mongoose in this file, and create a new Schema object:
 
@@ -222,17 +210,13 @@ The last line creates and exports the Recipe model object, with built in Mongo i
 
 ```js
 const mongoose = require('mongoose');
-const mongoUri = 'mongodb://localhost/rest-api';
-// or use an online db e.g.:
-// const mongoUri = 'mongodb://devereld:dd2345@ds015730.mlab.com:15730/recipes-dd';
+
+const mongoUri = 'mongodb://devereld:dd2345@ds015730.mlab.com:15730/recipes-dd';
+
 mongoose.connect(mongoUri);
 ```
 
 Note: to use a different database, simply provide a different connection string to the mongoUri variable:
-
-```js
-const mongoUri = 'mongodb://devereld:dd2345@ds015730.mlab.com:15730/recipes-dd';
-```
 
 2: Add a reference to our model `const recipeModels = require('./api/recipe.model');`:
 
@@ -320,22 +304,6 @@ Check that the server is still running and then visit the API endpoint for all r
 
 ### Importing Data
 
-You can insert data using the mongo CLI:
-
-```sh
-$ mongo
-> show dbs
-> use rest-api
-> show collections
-> db.createCollection('recipes')
-> db.recipes.insert( { "name": "Toast", "image": "toast.jpg", "description": "Tasty!" } )
-> db.recipes.find()
-```
-
-Here is a [quick reference](https://docs.mongodb.com/manual/reference/mongo-shell/) to mongo shell commands.
-
-Rather than use the Mongo command-line to insert entries into our collection, let's import recipe data with our API. Add a new route endpoint to `app.js`.
-
 1: Add to `app.js`:
 
 ```js
@@ -391,7 +359,7 @@ exports.import = function(req, res) {
 
 `Recipe` refers to the mongoose Recipe model. `create()` is a mongoose method
 
-This import method adds four items from the JSON to a recipes collection. The Recipe model is referenced here to call its create method. create() takes one or more documents in JSON form, and a callback to run on completion. If an error occurs, Terminal will return the error and the request will timeout in the browser. On success, the 202 "Accepted" HTTP status code is returned to the browser.
+This import method adds four items from the JSON to a recipes collection. The Recipe model is referenced here to call its create method. `create()` takes one or more documents in JSON form, and a callback to run on completion. If an error occurs, Terminal will return the error and the request will timeout in the browser. On success, the 202 "Accepted" HTTP status code is returned to the browser.
 
 Visit this new endpoint to import data.
 
@@ -399,99 +367,11 @@ Visit this new endpoint to import data.
 
 Now visit the `http://localhost:3001/api/recipes` endpoint to view the new recipes data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private `_id` and internal `__v` version key (added by Mongo to track changes or revisions).
 
-#### Test the Model
+#### Facilitate Testing 
 
-Try removing date from the model and importing again. The date property will be missing from the imported items.
+Review some of the [documentation](http://mongoosejs.com/docs/queries.html) for Mongoose and create a script to delete all recipes with [deleteMany](http://mongoosejs.com/docs/queries.html)
 
-#### Find By id
-
-Recall our route for getting an entry by id: `app.get('/recipes/:id', recipes.findById)`.
-
-Add the handler method to `recipe.controllers.js`:
-
-```js
-exports.findById = function(req, res) {
-  const id = req.params.id;
-  Recipe.findOne({ _id: id }, function(err, result) {
-    return res.send(result);
-  });
-};
-```
-
-This route's path uses a parameter pattern for id `/recipes/:id` which we can refer to in `req` to look up and return just one document.
-
-At your findAll endpoint `http://localhost:3001/api/recipes`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one recipe's document.
-
-e.g. `http://localhost:3001/api/recipes/< id goes here >`
-
-#### Add a Recipe
-
-We used create() for our import function to add multiple documents to our Recipes Mongo collection. Our POST handler uses the same method to add a single Recipe to the collection. Once added, the response is the full new Recipe's JSON object.
-
-`recipe-controllers.js`:
-
-```js
-exports.add = function(req, res) {
-  Recipe.create(req.body, function(err, recipe) {
-    if (err) return console.log(err);
-    return res.send(recipe);
-  });
-};
-```
-
-In a new tab - use cURL to POST to the add endpoint with the full Recipe JSON as the request body (making sure to check the URL port and path).
-
-```bash
-curl -i -X POST -H 'Content-Type: application/json' -d '{"title": "Toast", "image": "toast.png", "description":"Tasty!"}' http://localhost:3001/api/recipes
-```
-
-### Introducing Postman
-
-Since modelling endpoints is a common task and few enjoy using curl, most people use a utility such as [Postman](https://www.getpostman.com/).
-
-Download and install it [here](https://www.getpostman.com/).
-
-Test a GET in postman with `http://localhost:3001/api/recipes/`
-
-#### Create a new Recipe in Postman
-
-1. Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/recipes/`
-1. Choose `raw` in `Body` and set the text type to `JSON(application/json)`
-1. Set Body to `{"title": "Toast", "image": "toast.jpg", "description":"Postman? Tasty!"}`
-1. Hit `Send`
-
-Refresh `http://localhost:3001/recipes` to see the new entry at the end.
-
-Save your query in Postman to a new collection.
-
-#### Delete
-
-Our next REST endpoint, delete, reuses what we've done above. Add this to `recipe.controllers.js`.
-
-```js
-exports.delete = function(req, res) {
-  let id = req.params.id;
-  Recipe.remove({ _id: id }, function(result) {
-    return res.send(result);
-  });
-};
-```
-
-Check it out with curl (replacing the id at the end of the URL with a known id from you `api/recipes` endpoint):
-
-```sh
-curl -i -X DELETE http://localhost:3001/api/recipes/5addfa2fbc204c12425d85d4
-```
-
-Or by a Delete action in Postman.
-
-1. Set the action to Delete
-2. Append an id from the recipes endpoint to the /api/recipes endpoint
-3. Hit Send (e.g.: `http://localhost:3001/api/recipes/58c39048b3ddce0348706837`)
-
-Review some of the [documentation](http://mongoosejs.com/docs/queries.html) for Mongoose and create a script to delete all recipes.
-
-`app.delete('/api/killall', recipes.killall);`
+`app.get('/api/killall', recipes.killall);`
 
 ```js
 exports.killall = function(req, res) {
@@ -501,6 +381,10 @@ exports.killall = function(req, res) {
   })
 };
 ```
+
+#### Test the Model
+
+Try removing date from the model and importing again. The date property will be missing from the imported items.
 
 Test Mongoose by adding new properties to our recipes.
 
@@ -581,6 +465,92 @@ const RecipeSchema = new Schema({
 
 module.exports = mongoose.model('Recipe', RecipeSchema);
 ```
+
+#### Find By id
+
+Recall our route for getting an entry by id: `app.get('/recipes/:id', recipes.findById)`.
+
+Add the handler method to `recipe.controllers.js`:
+
+```js
+exports.findById = function(req, res) {
+  const id = req.params.id;
+  Recipe.findOne({ _id: id }, (err, result) => {
+    return res.send(result);
+  });
+};
+```
+
+This route's path uses a parameter pattern for id `/recipes/:id` which we can refer to in `req` to look up and return just one document.
+
+At your findAll endpoint `http://localhost:3001/api/recipes`, copy one of the ids, paste it in at the end of the current url in the browser and refresh. You'll get a single JSON object for that one recipe's document.
+
+e.g. `http://localhost:3001/api/recipes/< id goes here >`
+
+#### Add a Recipe
+
+We used `create()` for our import function inn order to add multiple documents to our Recipes Mongo collection. Our POST handler uses the same method to add a single Recipe to the collection. Once added, the response is the full new Recipe's JSON object.
+
+Edit `recipe-controllers.js`:
+
+```js
+exports.add = function(req, res) {
+  Recipe.create(req.body, function(err, recipe) {
+    if (err) return console.log(err);
+    return res.send(recipe);
+  });
+};
+```
+
+In a new tab - use cURL to POST to the add endpoint with the full Recipe JSON as the request body (making sure to check the URL port and path).
+
+```bash
+curl -i -X POST -H 'Content-Type: application/json' -d '{"title": "Toast", "image": "toast.png", "description":"Tasty!"}' http://localhost:3001/api/recipes
+```
+
+### Introducing Postman
+
+Since modelling endpoints is a common task and few enjoy using curl, most people use a utility such as [Postman](https://www.getpostman.com/).
+
+Download and install it [here](https://www.getpostman.com/).
+
+Test a GET in postman with `http://localhost:3001/api/recipes/`
+
+#### Create a new Recipe in Postman
+
+1. Set Postman to POST, set the URL in Postman to `http://localhost:3001/api/recipes/`
+1. Choose `raw` in `Body` and set the text type to `JSON(application/json)`
+1. Set Body to `{"title": "Toast", "image": "toast.jpg", "description":"Postman? Tasty!"}`
+1. Hit `Send`
+
+Refresh `http://localhost:3001/recipes` to see the new entry at the end.
+
+Save your query in Postman to a new collection.
+
+#### Delete
+
+Our next REST endpoint, delete, reuses what we've done above. Add this to `recipe.controllers.js`.
+
+```js
+exports.delete = function(req, res) {
+  let id = req.params.id;
+  Recipe.remove({ _id: id }, (result) => {
+    return res.send(result);
+  });
+};
+```
+
+Check it out with curl (replacing the id at the end of the URL with a known id from you `api/recipes` endpoint):
+
+```sh
+curl -i -X DELETE http://localhost:3001/api/recipes/5addfa2fbc204c12425d85d4
+```
+
+Or by a Delete action in Postman.
+
+1. Set the action to Delete
+2. Append an id from the recipes endpoint to the /api/recipes endpoint
+3. Hit Send (e.g.: `http://localhost:3001/api/recipes/58c39048b3ddce0348706837`)
 
 While we are here let's add these lines to `app.js` together with the other `app.use` middleware:
 
