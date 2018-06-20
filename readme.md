@@ -1,5 +1,14 @@
 # IV - Server Side with ExpressJS
 
+## Midterm Assignment
+
+1. Using the API developed in class in session 4a, create a backend that connects to your database on mLab.
+2. Using the front end developed in class in session 4b, extend the interface to support creating a new database entry via a form, and a detail view of a recipe with a proper route so that the user can use the back button to return to the recipe listing on the home page.
+
+## Reading
+
+A good video on the [Fetch API](https://youtu.be/Oive66jrwBs)
+
 ## Building a Rest API
 
 Take a peek at the [documentation](https://developer.github.com/v3/) for an API. Test this url in a browser: `https://api.github.com/users/12`.
