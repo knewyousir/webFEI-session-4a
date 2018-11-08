@@ -2,7 +2,7 @@
 
 ## Homework
 
-Build out an HTML page that displays the recipe data and that has a form that allows you to create a new recipe.
+Build out an HTML page that displays the recipe data when you click on a link. Add a form that calls the api to create a new recipe.
 
 ## Reading
 
