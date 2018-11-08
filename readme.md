@@ -1,9 +1,8 @@
 # IV - Server Side with ExpressJS
 
-## Midterm Assignment
+## Homework
 
-1. Using the API developed in class in session 4a, create a backend that connects to your database on mLab.
-2. Using the front end developed in class in session 4b, extend the interface to support creating a new database entry via a form, and a detail view of a recipe with a proper route so that the user can use the back button to return to the recipe listing on the home page.
+Build out an HTML page that displays the recipe data and that has a form that allows you to create a new recipe.
 
 ## Reading
 
@@ -11,12 +10,12 @@ A good video on the [Fetch API](https://youtu.be/Oive66jrwBs)
 
 ## Building a Rest API
 
-Take a peek at the [documentation](https://developer.github.com/v3/) for an API. Test this url in a browser: `https://api.github.com/users/12`.
+<!-- Take a peek at the [documentation](https://developer.github.com/v3/) for an API. Test this url in a browser: `https://api.github.com/users/12`. -->
 
 Building a URL route scheme to map requests to app actions.
 
 1. Run `$ npm init -y`
-1. Setup Tooling and npm Installs `npm install --save express mongoose body-parser nodemon`
+1. Setup Tooling and npm Installs `npm i -S express mongoose body-parser nodemon`
 1. Create an npm script for nodemon (`npm run start`)
 
 ```js
@@ -88,7 +87,7 @@ console.log('Server running at http://localhost:3001/');
 
 Run the app using `npm start`. Remember to keep an eye on the nodemon process during this exercise to see if it is hanging.
 
-### DEMO API Routes
+### DEMO API Routes and Schemas
 
 Here is a fairly standard ExpressJS application using the Mongoose driver:
 
@@ -132,15 +131,17 @@ app.listen(3001);
 console.log('Server running at http://localhost:3001/');
 ```
 
+Note the Schema `RecipeSchema`. Mongoose, everything is derived from a [Schema](https://mongoosejs.com/docs/guide.html#schemas) which maps to a MongoDB collection and defines the shape of the documents in that collection. Here, we've got a schema with two properties, `name` which will be a string and `ingredients` which will be an array.
+
 ## Using CommonJS
 
 We are going to use CommonJS components to organize our code.
 
 ### Controllers
 
-Create a new folder `api` and a file inside called `recipe.controllers.js`. We'll export each handler and create the functions in this file one by one.
+Create a new folder `api` and a file inside called `recipe.controllers.js`. We'll export each handler and create the functions in this file one by one. They are just empty functions for the moment.
 
-The are just empty functions for the moment.
+Add the following to `recipe.controllers.js`:
 
 ```js
 exports.findAll = function() {};
@@ -150,7 +151,7 @@ exports.update = function() {};
 exports.delete = function() {};
 ```
 
-Note the use of `exports`. This makes the functions available for import elsewhere in a our application.
+Note the use of `exports`. This makes the function available for import elsewhere in a our application.
 
 Update `app.js` to require our controllers (the .js file extension can be omitted):
 
@@ -180,7 +181,7 @@ The most common elements of a [REST application](http://www.restapitutorial.com/
 
 We've modeled our URL routes off of REST API conventions, and named our handling methods clearly - prefixing them with `api/` in order to differentiate them from any routes we create to serve the front end.
 
-Note the `recipes.function` notation. We'll create a recipes controller file and placed all our request event handling methods inside the it.
+Note the `recipes.function` notation. We're using our imported recipes controller file and have placed all our request event handling methods inside the it.
 
 <!-- ### Check if its working
 
@@ -213,6 +214,8 @@ Rather than using the MongoClient as we did previously ( e.g. `const mongo = req
 
 Mongoose is built upon the MongoDB driver we used previously so everything we are doing here would work with the original driver. However, Mongoose allows us to model our data - declare that the data be of a certain type, validate the data, and build queries.
 
+Since we are in a Node app we will continue to use CommonJS modules. 
+
 Add a new file `recipe.model.js` to `api` for our Recipe Model.
 
 Require Mongoose in this file, and create a new Schema object:
@@ -232,11 +235,11 @@ const RecipeSchema = new Schema({
 module.exports = mongoose.model('Recipe', RecipeSchema);
 ```
 
-We require mongoose and create an instance of a mongoose Schema.
+We require mongoose and create and export an instance of a mongoose Schema.
 
 The schema makes sure we're getting and setting well-formed data to and from the Mongo collection. Our schema has five String properties which define a Recipe object.
 
-The last line exports the RecipeShema together with Mongoose's built in Mongo interfacing methods. We'll refer to this Recipe object in other files.
+The last line exports the RecipeShema together with Mongoose's built in MongoDb interfacing methods. We'll refer to this Recipe object in other files.
 
 ### Using Mongoose Methods and Schema
 
@@ -391,7 +394,7 @@ exports.import = function(req, res) {
 };
 ```
 
-`Recipe` refers to the mongoose Recipe model. `Model.create()` is a mongoose method
+`Recipe` refers to the mongoose Recipe model we imported. `Model.create()` is a mongoose method
 
 In Mongoose, there is Model.create and Collection.insert - the latter isn't strictly part of Mongoose, but of the underlying MongoDB driver.
 
@@ -401,11 +404,13 @@ Visit this new endpoint to import data:
 
 [localhost:3001/api/import/](localhost:3001/api/import/)
 
-Now visit the `http://localhost:3001/api/recipes` endpoint to view the new recipes data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private `_id`.
+Now visit the [http://localhost:3001/api/recipes](http://localhost:3001/api/recipes) endpoint to view the new recipes data. You'll see an array of JSON objects, each in the defined schema, with an additional generated unique private `_id`.
 
 ### Facilitate Testing 
 
-Review some of the [documentation](http://mongoosejs.com/docs/queries.html) for Mongoose and create a script to delete all recipes with [deleteMany](http://mongoosejs.com/docs/queries.html)
+Review some of the [documentation](http://mongoosejs.com/docs/queries.html) for Mongoose and create a script to delete all recipes with [deleteMany](http://mongoosejs.com/docs/queries.html).
+
+We will call our endpoint 'killall.'
 
 Add `app.get('/api/killall', recipes.killall);` to `app.js`:
 
@@ -430,22 +435,37 @@ exports.killall = function(req, res) {
 };
 ```
 
-In this example we are deleting only those recipes where the title is Lasagna. Change the filter `{ title: 'Lasagna' }` to `{}` to remove them all.
+Run the function by visiting the killall endpoint and then returning to the recipes endpoint to examine the results.
+
+In this example we are deleting only those recipes where the title is Lasagna. 
+
+Change the filter `{ title: 'Lasagna' }` to `{}` to remove them all and run the function again.
 
 ### Introducing Postman
 
 Since modeling endpoints is a common task and few enjoy using curl (more on curl in a moment), most people use a utility such as [Postman](https://www.getpostman.com/).
 
-Download and install it [here](https://www.getpostman.com/). You need not create an account to use it.
+Download and install it [here](https://www.getpostman.com/). (You need not create an account to use it.)
 
-Test a GET in postman with `http://localhost:3001/api/recipes/`.
+Test a GET in postman with [http://localhost:3001/api/recipes/](http://localhost:3001/api/recipes/) and then delete all the recipes: [http://localhost:3001/api/killall/](http://localhost:3001/api/killall/)
 
 
 ### Test the Model
 
-Try removing date from `recipe.model` and importing again. The date property will be missing from the imported items.
+Try removing date from `recipe.model`:
 
-Add it back, this time using a default created value of type Date:
+```js
+const RecipeSchema = new Schema({
+  name: String,
+  title: String,
+  description: String,
+  image: String
+});
+```
+
+Run import again. The date property will be missing from the imported items.
+
+Add it back to the schema, this time using a default `created` value of type Date:
 
 ```js
 const RecipeSchema = new Schema({
@@ -465,59 +485,61 @@ Test Mongoose by adding new properties to our recipes.
 Edit the `import` function to include ingredients and preparation arrays:
 
 ```js
-{
-  "name": "recipe1309",
-  "title": "Lasagna",
-  "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
-  "image": "lasagna.png",
-  "ingredients": [
-    "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
-  ],
-  "preparation": [
-    {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
-  ]
-},
-{
-  "name": "recipe1404",
-  "title": "Pho-Chicken Noodle Soup",
-  "description": "Pho (pronounced \"fuh\") is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.",
-  "image": "pho.png",
-  "ingredients": [
-    "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
-  ],
-  "preparation": [
-    {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
-  ]
-},
-
-{
-  "name": "recipe1210",
-  "title": "Guacamole",
-  "description": "Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor - with this authentic Mexican guacamole recipe, though, you will be an expert in no time.",
-  "image": "guacamole.png",
-  "ingredients": [
-    "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
-  ],
-  "preparation": [
-    {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
-  ]
-},
-
-{
-  "name": "recipe1810",
-  "title": "Hamburger",
-  "description": "A Hamburger (often called a burger) is a type of sandwich in the form of  rounded bread sliced in half with its center filled with a patty which is usually ground beef, then topped with vegetables such as lettuce, tomatoes and onions.",
-  "image": "hamburger.png",
-  "ingredients": [
-    "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
-  ],
-  "preparation": [
-    {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
-  ]
-}
+exports.import = function(req, res) {
+  Recipe.create(
+    {
+      "title": "Lasagna",
+      "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
+      "image": "lasagna.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    {
+      "title": "Pho-Chicken Noodle Soup",
+      "description": "Pho (pronounced \"fuh\") is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.",
+      "image": "pho.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    {
+      "title": "Guacamole",
+      "description": "Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor - with this authentic Mexican guacamole recipe, though, you will be an expert in no time.",
+      "image": "guacamole.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    {
+      "title": "Hamburger",
+      "description": "A Hamburger (often called a burger) is a type of sandwich in the form of  rounded bread sliced in half with its center filled with a patty which is usually ground beef, then topped with vegetables such as lettuce, tomatoes and onions.",
+      "image": "hamburger.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    function(err) {
+      if (err) return console.log(err);
+      return res.sendStatus(202);
+    }
+  );
+};
 ```
 
-If you delete with `killall` and reload the sample data, it will not inlcude the arrays.
+If you delete with `killall` and reload the sample data, it will not include the arrays.
 
 Add new properties to our Recipe schema.
 
@@ -526,7 +548,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const RecipeSchema = new Schema({
-  name: String,
   title: String,
   created: { 
     type: Date,
@@ -541,7 +562,47 @@ const RecipeSchema = new Schema({
 module.exports = mongoose.model('Recipe', RecipeSchema);
 ```
 
-Kill and reimport the data. The data may be in a different order than in the schema. (There is no order in objects, so the order shouldn't matter but if it did then you'd want an array.)
+Kill and reimport the data using Postman. The data may be in a different order than in the schema. 
+
+There are eight data types supported by Mongoose:
+
+1. String
+1. Number
+1. Date
+1. Buffer
+1. Boolean
+1. Mixed
+1. ObjectId
+1. Array
+
+Each data type allows you to specify:
+
+* a default value
+* a custom validation function
+* indicate a field is required
+* a get function that allows you to manipulate the data before it is returned as an object
+* a set function that allows you to manipulate the data before it is saved to the database
+* create indexes to allow data to be fetched faster
+
+Certain data types allow you to customize how the data is stored and retrieved from the database. A String data type also allows you to specify the following additional options:
+
+* convert it to lowercase
+* convert it to uppercase
+* trim data prior to saving
+* a regular expression that can limit data allowed to be saved during the validation process
+* an enum that can define a list of strings that are valid
+
+The Number and Date properties both support specifying a minimum and maximum value that is allowed for that field.
+
+Most of the eight allowed data types should be quite familiar to you. However, there are several exceptions that may jump out to you, such as Buffer, Mixed, ObjectId, and Array.
+
+The Buffer data type allows you to save binary data. A common example of binary data would be an image or an encoded file, such as a PDF document.
+
+The Mixed data type turns the property into an "anything goes" field. This field resembles how many developers may use MongoDB because there is no defined structure. Be wary of using this data type as it loses many of the great features that Mongoose provides, such as data validation and detecting entity changes to automatically know to update the property when saving.
+
+The ObjectId data type commonly specifies a link to another document in your database. For example, if you had a collection of books and authors, the book document might contain an ObjectId property that refers to the specific author of the document.
+
+The Array data type allows you to store JavaScript-like arrays. With an Array data type, you can perform common JavaScript array operations on them, such as push, pop, shift, slice, etc.
 
 ### Find By id
 
@@ -579,9 +640,9 @@ exports.add = function(req, res) {
 };
 ```
 
-In a new tab - use cURL to POST to the add endpoint with the full Recipe JSON as the request body (making sure to check the URL port and path).
+In a new terminal tab - use cURL to POST to the add endpoint with the full Recipe JSON as the request body (making sure to check the URL port and path).
 
-```bash
+```sh
 curl -i -X POST -H 'Content-Type: application/json' -d '{"title": "Toast", "image": "toast.png", "description":"Tasty!"}' http://localhost:3001/api/recipes
 ```
 
@@ -594,7 +655,7 @@ curl -i -X POST -H 'Content-Type: application/json' -d '{"title": "Toast", "imag
 
 Refresh `http://localhost:3001/recipes` or use Postman's history to see the new entry at the end.
 
-Save your query in Postman to a new collection.
+Save your query in Postman to a new Postman collection.
 
 ### Delete
 
@@ -612,7 +673,7 @@ exports.delete = function(req, res) {
 Check it out with curl (replacing the id at the end of the URL with a known id from you `api/recipes` endpoint):
 
 ```sh
-curl -i -X DELETE http://localhost:3001/api/recipes/5addfa2fbc204c12425d85d4
+curl -i -X DELETE http://localhost:3001/api/recipes/5be48fb63746760366a67484
 ```
 
 Or by a Delete action in Postman.
@@ -620,6 +681,19 @@ Or by a Delete action in Postman.
 1. Set the action to Delete
 2. Append an id from the recipes endpoint to the /api/recipes endpoint
 3. Hit Send (e.g.: `http://localhost:3001/api/recipes/58c39048b3ddce0348706837`)
+
+It probably doesn't make much sense to send the results back from a delete function (since there are no results) so change it to use an [HTTP status code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success).
+
+```js
+exports.delete = function(req, res) {
+  let id = req.params.id;
+  Recipe.remove({ _id: id }, (result) => {
+    return res.sendStatus(451);
+  });
+};
+```
+
+451 - 'Unavailable For Legal Reasons', is used when resource access is denied for legal reasons, e.g. censorship or government-mandated blocked access. It is a reference to the novel Fahrenheit 451, where books are outlawed.
 
 ## Front End
 
@@ -635,7 +709,7 @@ Create an `app` folder and add `index.html`:
 </head>
 
 <body>
-  <a href="#">Slacker</a>
+  <a href="#">See Recipes</a>
   <div id="app"></div>
   
   <script>
@@ -672,20 +746,125 @@ Instead of XMLHTTPRequest we will use the new(-ish, the newer `async/await` api 
 
 `fetch` returns a promise.
 
+```js
+function fetchRecipes(callback) {
+  const data = fetch('http://localhost:3001/api/recipes')
+  console.log(data)
+}
+```
+
+A `then` function (like a callback), will only run when the data comes back.
+
+```js
+function fetchRecipes(callback) {
+  const dataPromise = fetch('http://localhost:3001/api/recipes')
+  dataPromise.then(data => {
+    console.log(data)
+  })
+}
+```
+
+The data can be just about anything but we know we are looking for json so we need to convert it to json:
+
+```js
+function fetchRecipes(callback) {
+  const dataPromise = fetch('http://localhost:3001/api/recipes')
+  dataPromise.then(data => {
+    console.log(data.json())
+  })
+}
+```
+
+.then fires when the promise comes back, we convert the response to json and use .then to access it:
+
+```js
+function fetchRecipes(callback) {
+  const dataPromise = fetch('http://localhost:3001/api/recipes')
+  dataPromise
+  .then(data => data.json()
+  .then(data => console.log(data)))
+}
+```
+
+.catch allows us to work with the error. Use https:
+
+```js
+function fetchRecipes(callback) {
+  const dataPromise = fetch('https://localhost:3001/api/recipes')
+  dataPromise
+  .then(data => data.json()
+  .then(data => console.log(data)))
+  .catch( (err) => { console.error(err)})
+}
+```
+
 You can pass the url and callback in separately:
 
 ```js
-    function fetchRecipes(url, callback) {
-      console.log(callback)
-      fetch(url)
-      .then( res => res.json() )
-      .then( data => callback(data) )
-    }
-    
-    fetchRecipes( 'http://localhost:3001/api/recipes', (content) => {
-      console.log(content)
-    })
+function fetchRecipes(url, callback) {
+  fetch(url)
+  .then( res => res.json() )
+  .then( data => callback(data) )
+  .catch( (err) => { console.error(err)})
+}
+
+fetchRecipes( 'http://localhost:3001/api/recipes', (content) => {
+  console.log(content)
+})
 ```
+
+And use an eventListener to get the data:
+
+```js
+var elem = document.querySelector('#app');
+var link = document.querySelector('a');
+
+link.addEventListener('click', getEm)
+
+function fetchRecipes(url, callback) {
+  fetch(url)
+  .then( res => res.json() )
+  .then( data => callback(data) )
+  .catch( (err) => { console.error(err)})
+}
+
+function getEm(){
+  fetchRecipes( 'http://localhost:3001/api/recipes', (content) => {
+    console.log(content)
+  })
+}
+```
+
+<!-- 
+var elem = document.querySelector('#app');
+var link = document.querySelector('a');
+
+link.addEventListener('click', getEm)
+
+function fetchRecipes(url, callback) {
+  fetch(url)
+  .then( res => res.json() )
+  .then( data => callback(data) )
+  .catch( (err) => { console.error(err)})
+}
+
+function getEm(){
+  fetchRecipes( 'http://localhost:3001/api/recipes', (recipes) => {
+    console.log(recipes);
+    const markup = `
+    <ul>
+      ${recipes.map(
+        recipe => `<li>${recipe.title}</li>`
+        ).join('')}
+      </ul>
+      `
+      elem.innerHTML = markup;
+    })
+  } 
+  -->
+			
+
+
 
 <!-- While we are here let's add these lines to `app.js` together with the other `app.use` middleware:
 
@@ -702,4 +881,4 @@ Comment them out, we'll need them later. -->
 
 ## Notes
 
-https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527
+<!-- https://code.tutsplus.com/articles/an-introduction-to-mongoose-for-mongodb-and-nodejs--cms-29527 -->
