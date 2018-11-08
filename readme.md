@@ -695,6 +695,8 @@ exports.delete = function(req, res) {
 
 451 - 'Unavailable For Legal Reasons', is used when resource access is denied for legal reasons, e.g. censorship or government-mandated blocked access. It is a reference to the novel Fahrenheit 451, where books are outlawed.
 
+FWIW - [this](https://www.ietf.org/rfc/rfc2324.txt) was considered funny in 1999.
+
 ## Front End
 
 Create an `app` folder and add `index.html`:
