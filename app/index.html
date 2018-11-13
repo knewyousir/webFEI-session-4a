@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>START</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="leftBox">
+      <p>Recipe Details</p>
+      <p>Ingredients</p>
+      <div id="ingreds"></div>
+      <p>Steps</p>
+      <div id="steps"></div>
+    </div>
+    <div id="aside">
+      <p>Recipe Search</p>
+      <a id="seeRecipes" href="#">See Recipes</a>
+      <div id="app"></div>
+    </div>
+    <div id="submitRecipe">
+        <p>Submit a New Recipe</p>
+        <form class="recipeInput" id="recipeInput" method="post" action="/">
+            
+            <label for="title">
+              Title:
+              <input type="text" name="title" id="title">
+            </label>
+
+            <label for="description">
+              Description:
+              <input type="text" name="description" id="description">
+            </label>
+
+            <label for="step1">
+              Step 1:
+              <input type="text" name="step1" id="step1">
+            </label>
+
+            <label for="step2">
+              Step 2:
+              <input type="text" name="step2" id="step2">
+            </label>
+
+            <label for="step3">
+              Step 3:
+              <input type="text" name="step3" id="step3">
+            </label>
+
+            <label for="ingred1">
+              Ingredient 1:
+              <input type="text" name="ingred1" id="ingred1">
+            </label>
+  
+            <label for="ingred2">
+              Ingredient 2:
+              <input type="text" name="ingred2" id="ingred2">
+            </label>
+  
+            <label for="ingred3">
+              Ingredient 3:
+              <input type="text" name="ingred3" id="ingred3">
+            </label>
+
+            <p><button type="submit">Submit</button></p>
+        </form>
+    </div>
+  </div>
+  
+  <script>
+    
+    var elem = document.querySelector('#app');
+    var elemIngreds = document.querySelector('#ingreds');
+    var elemSteps = document.querySelector('#steps');
+    var seeRecipes = document.querySelector('#seeRecipes');
+    
+    seeRecipes.addEventListener('click', getEm);
+    elem.addEventListener('click', checkClass);
+    document.addEventListener('submit', submitNClear);
+
+    function submitNClear(){
+      //Parse body
+      //Create array of steps
+      //Create array of ingreds
+      //Create data object
+      //Submit data object
+      submitFormData();
+      //Clear form data
+      clearFormData();
+    }
+
+    function submitFormData(){
+
+    }
+
+    function clearFormData(){
+
+    }
+    
+    function checkClass(){
+      if (((event.target.className).slice(0, 4)) === "rcp_"){
+        let id = event.target.className.slice(4);
+        renderRecipe(id);
+      };
+    }
+    
+    function renderRecipe(id){
+      var objData = JSON.parse(localStorage.getItem('recipeData'));
+      objData.forEach(recipe => {
+        if (recipe._id === id){
+          // console.log("found matching recipe id...")
+          var stepsData = recipe.preparation;
+          var ingredsData = recipe.ingredients;
+          // Because these don't exist in the sample data
+          stepsData = ['step 1', 'step 2', 'step 3'];
+          ingredsData = ['ingred 1', 'ingred 2', 'ingred 3'];
+          // Template strings buildup
+          var tempSteps =`
+          <ul>
+            ${stepsData.map(
+              step => `<li>${step}</li>`
+              ).join('')}
+            </ul>
+            `
+            var tempIngreds =`
+            <ul>
+              ${ingredsData.map(
+                ingred => `<li>${ingred}</li>`
+                ).join('')}
+              </ul>
+              `
+              elemSteps.innerHTML = tempSteps;
+              elemIngreds.innerHTML = tempIngreds;
+            } else {
+              // console.log("no matching recipe id found!")
+            }
+          });
+        }
+        
+        function fetchRecipes(url, callback) {
+          fetch(url)
+          .then( res => res.json() )
+          .then( data => callback(data) )
+          .catch( (err) => { console.error(err)})
+        }
+        
+        function getEm(){
+          fetchRecipes( 'http://localhost:3001/api/recipes', (recipes) => {
+            //store it first
+            if (localStorage.getItem('recipeData') === null ){
+              // console.log("localStorageItem was not found");
+              localStorage.setItem('recipeData', JSON.stringify(recipes));
+            } else {
+              // console.log("localStorageItem was found");
+            }
+            // for (recipe in recipes)
+            const markup = `
+            <ul>
+              ${recipes.map(
+                recipe => `<li><a class="rcp_${recipe._id}" href="#">${recipe.title}</a></li>`
+                ).join('')}
+              </ul>
+              `
+              elem.innerHTML = markup;
+            })
+          }            
+        </script>
+      </body>              
+      </html>
