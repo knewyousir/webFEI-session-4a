@@ -22,51 +22,51 @@
       <div id="app"></div>
     </div>
     <div id="submitRecipe">
-        <p>Submit a New Recipe</p>
-        <form class="recipeInput" id="recipeInput" method="post" action="/">
-            
-            <label for="title">
-              Title:
-              <input type="text" name="title" id="title">
-            </label>
-
-            <label for="description">
-              Description:
-              <input type="text" name="description" id="description">
-            </label>
-
-            <label for="step1">
-              Step 1:
-              <input type="text" name="step1" id="step1">
-            </label>
-
-            <label for="step2">
-              Step 2:
-              <input type="text" name="step2" id="step2">
-            </label>
-
-            <label for="step3">
-              Step 3:
-              <input type="text" name="step3" id="step3">
-            </label>
-
-            <label for="ingred1">
-              Ingredient 1:
-              <input type="text" name="ingred1" id="ingred1">
-            </label>
-  
-            <label for="ingred2">
-              Ingredient 2:
-              <input type="text" name="ingred2" id="ingred2">
-            </label>
-  
-            <label for="ingred3">
-              Ingredient 3:
-              <input type="text" name="ingred3" id="ingred3">
-            </label>
-
-            <p><button type="submit">Submit</button></p>
-        </form>
+      <p>Submit a New Recipe</p>
+      <form class="recipeInput" id="recipeInput" action="/api/recipes" method="POST">
+        
+        <label for="title">
+          Title:
+          <input type="text" name="title" id="title">
+        </label>
+        
+        <label for="description">
+          Description:
+          <input type="text" name="description" id="description">
+        </label>
+        
+        <!-- <label for="step1">
+          Step 1:
+          <input type="text" name="step1" id="step1">
+        </label>
+        
+        <label for="step2">
+          Step 2:
+          <input type="text" name="step2" id="step2">
+        </label>
+        
+        <label for="step3">
+          Step 3:
+          <input type="text" name="step3" id="step3">
+        </label>
+        
+        <label for="ingred1">
+          Ingredient 1:
+          <input type="text" name="ingred1" id="ingred1">
+        </label>
+        
+        <label for="ingred2">
+          Ingredient 2:
+          <input type="text" name="ingred2" id="ingred2">
+        </label>
+        
+        <label for="ingred3">
+          Ingredient 3:
+          <input type="text" name="ingred3" id="ingred3">
+        </label> -->
+        
+        <p><button type="submit">Submit</button></p>
+      </form>
     </div>
   </div>
   
@@ -80,7 +80,7 @@
     seeRecipes.addEventListener('click', getEm);
     elem.addEventListener('click', checkClass);
     document.addEventListener('submit', submitNClear);
-
+    
     function submitNClear(){
       //Parse body
       //Create array of steps
@@ -91,13 +91,13 @@
       //Clear form data
       clearFormData();
     }
-
+    
     function submitFormData(){
-
+      
     }
-
+    
     function clearFormData(){
-
+      
     }
     
     function checkClass(){
@@ -111,31 +111,27 @@
       var objData = JSON.parse(localStorage.getItem('recipeData'));
       objData.forEach(recipe => {
         if (recipe._id === id){
-          // console.log("found matching recipe id...")
           var stepsData = recipe.preparation;
           var ingredsData = recipe.ingredients;
-          // Because these don't exist in the sample data
-          stepsData = ['step 1', 'step 2', 'step 3'];
-          ingredsData = ['ingred 1', 'ingred 2', 'ingred 3'];
           // Template strings buildup
           var tempSteps =`
-          <ul>
+            <ul>
             ${stepsData.map(
-              step => `<li>${step}</li>`
+              step => `<li>${step.step}</li>`
               ).join('')}
             </ul>
-            `
+            `;
             var tempIngreds =`
-            <ul>
+              <ul>
               ${ingredsData.map(
                 ingred => `<li>${ingred}</li>`
                 ).join('')}
               </ul>
-              `
+              `;
               elemSteps.innerHTML = tempSteps;
               elemIngreds.innerHTML = tempIngreds;
             } else {
-              // console.log("no matching recipe id found!")
+              //
             }
           });
         }

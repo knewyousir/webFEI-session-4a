@@ -8,81 +8,83 @@ exports.findAll = function(req, res) {
 };
 
 exports.findById = function(req, res) {
-    const id = req.params.id;
-    Recipe.findOne({ _id: id }, (err, result) => {
-        return res.send(result);
-    })
+  const id = req.params.id;
+  Recipe.findOne({ _id: id }, (err, result) => {
+    return res.send(result);
+  })
 };
 
 exports.add = function(req, res) {
-  // var myData = new Recipe(req.body);
-  // myData.save()
-  //   .then(item => {
-  //     res.send("item saved to db");
-  //   })
-  //   .catch(err => {
-  //     res.status(400).send("unable to save to db";)
-  //   });
   Recipe.create( req.body, (err, recipe) => {
-      if (err) return console.log(err);
-      return res.send(recipe);
+    if (err) return console.log(err);
+    return res.send(recipe);
   });
 };
 
 exports.update = function() {};
 exports.delete = function(req, res) {
-    let id = req.params.id;
-    Recipe.remove({ _id: id }, (result) => {
-        return res.send(result);
-    });
+  let id = req.params.id;
+  Recipe.remove({ _id: id }, (result) => {
+    return res.send(result);
+  });
 };
 
 exports.killall = function(req, res) {
-    Recipe.deleteMany({}, err => {
-        if (err) return console.log(err);
-        return res.sendStatus(200);
-    });
+  Recipe.deleteMany({}, err => {
+    if (err) return console.log(err);
+    return res.sendStatus(200);
+  });
 }
 
 exports.import = function(req, res) {
-    Recipe.create(
-      {
-        name: 'recipe1309',
-        title: 'Lasagna',
-        date: '2013-09-01',
-        description:
-          'Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.',
-        image: 'lasagna.png'
-      },
-      {
-        name: 'recipe1404',
-        title: 'Pho-Chicken Noodle Soup',
-        date: '2014-04-15',
-        description:
-          'Pho (pronounced "fuh") is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.',
-        image: 'pho.png'
-      },
-  
-      {
-        name: 'recipe1210',
-        title: 'Guacamole',
-        date: '2016-10-01',
-        description:
-          'Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor - with this authentic Mexican guacamole recipe, though, you will be an expert in no time.',
-        image: 'guacamole.png'
-      },
-  
-      {
-        name: 'recipe1810',
-        title: 'Hamburger',
-        date: '2012-10-20',
-        description:
-          'A Hamburger (often called a burger) is a type of sandwich in the form of  rounded bread sliced in half with its center filled with a patty which is usually ground beef, then topped with vegetables such as lettuce, tomatoes and onions.',
-        image: 'hamburger.png'
-      },
-      function(err) {
-        if (err) return console.log(err);
-        return res.sendStatus(202);
-      }
+  Recipe.create(
+    {
+      "title": "Lasagna",
+      "description": "Lasagna noodles piled high and layered full of three kinds of cheese to go along with the perfect blend of meaty and zesty, tomato pasta sauce all loaded with herbs.",
+      "image": "lasagna.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    {
+      "title": "Pho-Chicken Noodle Soup",
+      "description": "Pho (pronounced \"fuh\") is the most popular food in Vietnam, often eaten for breakfast, lunch and dinner. It is made from a special broth that simmers for several hours infused with exotic spices and served over rice noodles with fresh herbs.",
+      "image": "pho.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    {
+      "title": "Guacamole",
+      "description": "Guacamole is definitely a staple of Mexican cuisine. Even though Guacamole is pretty simple, it can be tough to get the perfect flavor - with this authentic Mexican guacamole recipe, though, you will be an expert in no time.",
+      "image": "guacamole.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    {
+      "title": "Hamburger",
+      "description": "A Hamburger (often called a burger) is a type of sandwich in the form of  rounded bread sliced in half with its center filled with a patty which is usually ground beef, then topped with vegetables such as lettuce, tomatoes and onions.",
+      "image": "hamburger.png",
+      "ingredients": [
+        "salt", "honey", "sugar", "rice", "walnuts", "lime juice"
+      ],
+      "preparation": [
+        {"step": "Boil water"}, {"step": "Fry the eggs"}, {"step": "Serve hot"}
+      ]
+    },
+    function(err) {
+      if (err) return console.log(err);
+      return res.sendStatus(202);
+    }
     );
   };
